@@ -314,9 +314,7 @@ All missions are logged in the `logs/` directory with:
 
 This is a conceptual project. Contributions, suggestions, and improvements are welcome!
 
-## License
 
-[Specify your license here - e.g., MIT, GPL, etc.]
 
 ## Author
 
