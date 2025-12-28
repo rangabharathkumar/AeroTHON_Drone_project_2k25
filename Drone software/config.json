@@ -1,0 +1,73 @@
+{
+  "search_areas": [
+    {
+      "name": "Area 1",
+      "min_lat": 12.9762,
+      "max_lat": 12.9782,
+      "min_lon": 77.6412,
+      "max_lon": 77.6432,
+      "waypoints": [
+        {"lat": 12.9762, "lon": 77.6412, "alt": 15.0},
+        {"lat": 12.9782, "lon": 77.6412, "alt": 15.0},
+        {"lat": 12.9782, "lon": 77.6432, "alt": 15.0},
+        {"lat": 12.9762, "lon": 77.6432, "alt": 15.0},
+        {"lat": 12.9762, "lon": 77.6412, "alt": 15.0}
+      ]
+    },
+    {
+      "name": "Area 2",
+      "min_lat": 12.9862,
+      "max_lat": 12.9882,
+      "min_lon": 77.6512,
+      "max_lon": 77.6532,
+      "waypoints": [
+        {"lat": 12.9862, "lon": 77.6512, "alt": 15.0},
+        {"lat": 12.9882, "lon": 77.6512, "alt": 15.0},
+        {"lat": 12.9882, "lon": 77.6532, "alt": 15.0},
+        {"lat": 12.9862, "lon": 77.6532, "alt": 15.0},
+        {"lat": 12.9862, "lon": 77.6512, "alt": 15.0}
+      ]
+    }
+  ],
+  "targets": [
+    {
+      "name": "Target 1",
+      "latitude": 12.9772,
+      "longitude": 77.6422,
+      "altitude": 15.0
+    },
+    {
+      "name": "Target 2",
+      "latitude": 12.9872,
+      "longitude": 77.6522,
+      "altitude": 15.0
+    }
+  ],
+  "mission_parameters": {
+    "mission_altitude": 15.0,
+    "drop_altitude": 10.0,
+    "search_timeout": 300,
+    "default_search_area": "Area 1",
+    "default_target": "Target 1"
+  },
+  "rc_channel_functions": {
+    "mode_switch": {
+      "channel": 5,
+      "positions": {
+        "0": "manual",
+        "1": "autonomous"
+      }
+    },
+    "area_select": {
+      "channel": 6,
+      "positions": {
+        "0": "Area 1",
+        "1": "Area 2"
+      }
+    },
+    "payload_drop": {
+      "channel": 7,
+      "position": 1
+    }
+  }
+}

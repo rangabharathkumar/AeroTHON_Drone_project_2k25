@@ -1,0 +1,12 @@
+numpy
+opencv-python
+torch
+torchvision
+ultralytics
+mavsdk
+gstreamer-python
+flask
+RPi.GPIO
+pyserial
+dronekit
+pymavlink

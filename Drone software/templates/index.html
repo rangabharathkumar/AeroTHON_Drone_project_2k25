@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drone Control System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+        }
+        .video-container {
+            margin: 20px 0;
+            text-align: center;
+        }
+        .video-feed {
+            max-width: 100%;
+            border: 3px solid #333;
+            border-radius: 5px;
+        }
+        .status-panel {
+            background-color: white;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status-item {
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .status-label {
+            font-weight: bold;
+            display: inline-block;
+            width: 150px;
+        }
+        .status-value {
+            display: inline-block;
+        }
+        .detection {
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .detected {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .not-detected {
+            background-color: #f44336;
+            color: white;
+        }
+        .mission-manual {
+            background-color: #2196F3;
+            color: white;
+        }
+        .mission-autonomous {
+            background-color: #FF9800;
+            color: white;
+        }
+        .disaster-fire {
+            background-color: #f44336;
+            color: white;
+        }
+        .disaster-flood {
+            background-color: #2196F3;
+            color: white;
+        }
+        .disaster-collapsed_buildings {
+            background-color: #795548;
+            color: white;
+        }
+        .disaster-road_accidents {
+            background-color: #FF9800;
+            color: white;
+        }
+        .disaster-normal {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .action-button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .action-button:hover {
+            background-color: #3e8e41;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>AeroTHON 2025 Drone Control System</h1>
+    </div>
+    
+    <div class="container">
+        <div class="status-panel">
+            <h2>Mission Status</h2>
+            <div class="status-item">
+                <span class="status-label">Mission Type:</span>
+                <span class="status-value" id="mission-type">Loading...</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Target Detection:</span>
+                <span class="status-value" id="target-status">Loading...</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Disaster Detection:</span>
+                <span class="status-value" id="disaster-status">Loading...</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Disaster Type:</span>
+                <span class="status-value" id="disaster-type">None</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Last Updated:</span>
+                <span class="status-value" id="last-updated">Never</span>
+            </div>
+            <div class="status-item" id="payload-control" style="display:none;">
+                <button id="drop-payload-btn" class="action-button">DROP PAYLOAD</button>
+                <span id="payload-status" class="status-value"></span>
+            </div>
+        </div>
+        
+        <div class="video-container">
+            <h2>Live Video Feed</h2>
+            <img src="{{ url_for('video_feed') }}" class="video-feed" alt="Live Video Feed">
+        </div>
+    </div>
+
+    <script>
+        function updateStatus() {
+            fetch('/status')
+                .then(response => response.json())
+                .then(data => {
+                    // Update mission type
+                    const missionType = document.getElementById('mission-type');
+                    missionType.textContent = data.mission || 'Unknown';
+                    missionType.className = data.mission ? `detection mission-${data.mission}` : '';
+                    
+                    // Update target status
+                    const targetStatus = document.getElementById('target-status');
+                    targetStatus.textContent = data.target_detected ? 'Detected' : 'Not Detected';
+                    targetStatus.className = `detection ${data.target_detected ? 'detected' : 'not-detected'}`;
+                    
+                    // Show payload control if target detected and in manual mode
+                    const payloadControl = document.getElementById('payload-control');
+                    if (data.target_detected && data.mission === 'manual') {
+                        payloadControl.style.display = 'block';
+                    } else {
+                        payloadControl.style.display = 'none';
+                    }
+                    
+                    // Update disaster status
+                    const disasterStatus = document.getElementById('disaster-status');
+                    disasterStatus.textContent = data.disaster_detected ? 'Detected' : 'Not Detected';
+                    disasterStatus.className = `detection ${data.disaster_detected ? 'detected' : 'not-detected'}`;
+                    
+                    // Update disaster type
+                    const disasterType = document.getElementById('disaster-type');
+                    disasterType.textContent = data.disaster_type || 'None';
+                    disasterType.className = data.disaster_type ? `detection disaster-${data.disaster_type}` : '';
+                    
+                    // Update timestamp
+                    const lastUpdated = document.getElementById('last-updated');
+                    const date = new Date(data.timestamp * 1000);
+                    lastUpdated.textContent = date.toLocaleTimeString();
+                })
+                .catch(error => {
+                    console.error('Error fetching status:', error);
+                });
+        }
+        
+        // Add event listener for payload drop button
+        document.getElementById('drop-payload-btn').addEventListener('click', function() {
+            const payloadStatus = document.getElementById('payload-status');
+            payloadStatus.textContent = 'Dropping payload...';
+            
+            fetch('/drop_payload', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                payloadStatus.textContent = data.message;
+                setTimeout(() => {
+                    payloadStatus.textContent = '';
+                }, 3000);
+            })
+            .catch(error => {
+                console.error('Error dropping payload:', error);
+                payloadStatus.textContent = 'Error dropping payload';
+            });
+        });
+        
+        // Update status every 2 seconds
+        setInterval(updateStatus, 2000);
+        
+        // Initial update
+        updateStatus();
+    </script>
+</body>
+</html>
